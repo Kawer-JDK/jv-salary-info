@@ -23,11 +23,6 @@ public class SalaryInfo {
                         for (int i = 0; i < data.length; i++) {
                             String[] dataSplited = data[i].split(" ");
 
-                            if (dataSplited[0] != null &&
-                                    dataSplited[1] != null &&
-                                    dataSplited[2] != null &&
-                                    dataSplited[3] != null) {
-
                         if (names[j].equals(dataSplited[1])) {
                             String[] dataDateSplited = dataSplited[0].split("\\.");
                             String fullDate = dataDateSplited[2] + dataDateSplited[1] + dataDateSplited[0];
@@ -36,12 +31,14 @@ public class SalaryInfo {
                             if (dateAsNumber >= dateFromAsNumber && dateAsNumber <= dateToAsNumber) {
                                 int hours = Integer.valueOf(dataSplited[2]);
                                 int salaryOnHour = Integer.valueOf(dataSplited[3]);
-                                salary = hours * salaryOnHour;
+                                salary += hours * salaryOnHour;
                             }
-                        }
                     }
                 }
-                        result += names[j] + " - " + salary + "\n";
+                        result += names[j] + " - " + salary;
+                        if (j < names.length - 1) {
+                            result += "\n";
+                        }
             }
         }
         String finalResult = "Report for period " + dateFrom + " - " + dateTo + "\n" + result;
