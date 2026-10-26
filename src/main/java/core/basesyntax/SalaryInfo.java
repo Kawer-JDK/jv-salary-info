@@ -1,52 +1,54 @@
 package core.basesyntax;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
 public class SalaryInfo {
 
-    private String newLine = System.lineSeparator();
+    private static final int DATE_INDEX = 0;
+    private static final int NAME_INDEX = 1;
+    private static final int HOURS_INDEX = 2;
+    private static final int SALARY_PER_HOUR_INDEX = 3;
 
     public String getSalaryInfo(String[] names,
                                 String[] data,
                                 String dateFrom,
                                 String dateTo) {
 
-        String result = "";
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+        LocalDate dateToFormeted = LocalDate.parse(dateTo, formatter);
+        LocalDate dateFromFormeted = LocalDate.parse(dateFrom, formatter);
 
-        if (dateFrom != null && dateTo != null) {
+        StringBuilder stringBuilder = new StringBuilder("Report for period ");
+        stringBuilder.append(dateFrom)
+                .append(" - ")
+                .append(dateTo)
+                .append("\r\n");
 
-            String[] dateFromSplited = dateFrom.split("\\.");
-            String[] dateToSplited = dateTo.split("\\.");
-            String fullDateFrom = dateFromSplited[2] + dateFromSplited[1] + dateFromSplited[0];
-            String fullDateTo = dateToSplited[2] + dateToSplited[1] + dateToSplited[0];
-            int dateFromAsNumber = Integer.valueOf(fullDateFrom);
-            int dateToAsNumber = Integer.valueOf(fullDateTo);
+        for (int i = 0; i < names.length; i++) {
+            int salary = 0;
 
-            for (int j = 0; j < names.length; j++) {
-                int salary = 0;
-                for (int i = 0; i < data.length; i++) {
-                    String[] dataSplited = data[i].split(" ");
+            for (int j = 0; j < data.length; j++) {
+                String[] splitedData = data[j].split(" ");
+                LocalDate actualDate = LocalDate.parse(splitedData[DATE_INDEX], formatter);
+                if (names[i].equals(splitedData[NAME_INDEX])) {
+                    if ((actualDate.isAfter(dateFromFormeted)
+                            || actualDate.isEqual(dateFromFormeted))
+                            && (actualDate.isBefore(dateToFormeted)
+                            || actualDate.isEqual(dateToFormeted))) {
 
-                    if (names[j].equals(dataSplited[1])) {
-                        String[] dataDateSplited = dataSplited[0].split("\\.");
-                        String fullDate = dataDateSplited[2]
-                                + dataDateSplited[1] + dataDateSplited[0];
-                        int dateAsNumber = Integer.valueOf(fullDate);
-
-                        if (dateAsNumber >= dateFromAsNumber
-                                && dateAsNumber <= dateToAsNumber) {
-                            int hours = Integer.valueOf(dataSplited[2]);
-                            int salaryOnHour = Integer.valueOf(dataSplited[3]);
-                            salary += hours * salaryOnHour;
-                        }
+                        int hourName = Integer.valueOf(splitedData[HOURS_INDEX]);
+                        int salaryName = Integer.valueOf(splitedData[SALARY_PER_HOUR_INDEX]);
+                        salary += hourName * salaryName;
                     }
                 }
-                result += names[j] + " - " + salary;
-                if (j < names.length - 1) {
-                    result += newLine;
-                }
+            }
+            stringBuilder.append(names[i]).append(" - ").append(salary);
+            if (i < names.length - 1) {
+                stringBuilder.append("\r\n");
             }
         }
-        String finalResult = "Report for period " + dateFrom + " - " + dateTo + newLine + result;
 
-        return finalResult;
+        return stringBuilder.toString();
     }
 }
